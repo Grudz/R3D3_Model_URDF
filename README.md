@@ -1,6 +1,6 @@
 # ECE5532 - Final Project 
 
-## R3D3: The Mantis Transformation
+## R3D3: The Mantis Transformation.
 
 Note, the Mantis namespace is still being used to control the kinematics of the robot. The camera and lidar have been slightly moved forward and the caster wheels have been adjusted. The main drivewheels radius and distance apart of not changed.
 
