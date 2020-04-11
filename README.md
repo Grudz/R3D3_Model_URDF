@@ -1,7 +1,7 @@
 # ECE5532 - Final Project 
 
-## Using this, the goal is to find out exaclty what will be universal to this project
+## R3D3: The Mantis Transformation
 
-For example: I will be wokring on one situation while you will work on another. This should highlight stuff that we both will be using and can refer too: vehicle construction and properties, intialization stuff, and maybe stuff relative to recieveing infromation from certain nodes. 
+Note, the Mantis namespace is still being used to control the kinematics of the robot. The camera and lidar have been slightly moved forward and the caster wheels have been adjusted. 
 
-**An idea: Maybe we can create seperate folders called "Ben" and "Sam" where we could store our additions to this project**
+**An idea: Sam, do you want to work on the part of the IGVC course where you avoid the cones and follow the white line around the track? I will focus specifically on the part of the course where there is random cones and obstacles and no white lines. The robot has to find what gate is open. (The part in the level 2 course thats different from the level 1 course)**
