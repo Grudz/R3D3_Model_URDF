@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find igvc_flatland)/launch/advanced_course_world.launch" >
+    <arg name="initial_pose_x" value="-25.0" />
+    <arg name="initial_pose_y" value="-1.0" />
+    <arg name="initial_pose_a" value="1.5707" />
+    <arg name="run_rviz" value="true" />
+  </include>
+
+</launch>

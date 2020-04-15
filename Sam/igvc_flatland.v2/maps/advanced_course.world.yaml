@@ -1,0 +1,18 @@
+properties: {} # For later use
+layers:  # Support for arbitrary number of layers
+  - name: "robot"
+  - name: "lines"
+    map: "advanced_course_lines.yaml"
+    color: [0, 1, 0, 1]
+  - name: "objects"
+    map: "advanced_course_objects.yaml"
+    color: [1, 0, 0, 1]
+plugins:
+  - name: random_gates
+    type: RandomGates
+    layer: "objects"
+    gate_width: 1.4
+    gates:
+      - [-11.75, 0.04]
+      - [ -0.04, 0.04]
+      - [ 11.63, 0.04]

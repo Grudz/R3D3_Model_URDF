@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<launch>
+   
+  <include file="$(find igvc_flatland)/launch/basic_course_world.launch" >
+    <arg name="initial_pose_x" value="-25.0" />
+    <arg name="initial_pose_y" value="-1.0" />
+    <arg name="initial_pose_a" value="1.5707" />
+    <arg name="run_rviz" value="true" />
+  </include>
+  
+  <!-- This just launches an empty Gazebo World -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+   
+    <group ns="mantis"> <!-- (note "group"), mantis ns b/c using it's diff drive kinematics -->
+    <rosparam file="$(find r3d3_model)/yaml/roscontrol_params.yaml" />
+
+  <!-- Parse the URDF model and store the result in the 'robot_description' parameter -->
+
+    <param name="robot_description" command="$(find xacro)/xacro '$(find r3d3_model)/urdf/r3d3.urdf.xacro'" />
+
+    <node pkg="gazebo_ros" type="spawn_model" name="spawn_r3d3" args="-urdf -param robot_description -model r3d3 "/>
+    
+    <node pkg="controller_manager" type="spawner" name="controller_spawner" args="joint_state_controller left_wheel_controller right_wheel_controller" />
+
+
+    <!-- This node loads the 'robot_description' parameter, subscribes to the 'joint_states' topic,
+         and publishes TF transforms for the robot's joints -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="tf_prefix" value="r3d3" />
+    </node>
+    <!--node pkg="mantis_model" type="mantis_joint_pub" name="mantis_joint_pub" /-->
+  </group>  
+  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find igvc_flatland)/maps/basic_course_lines.yaml"/>
+  
+  <node pkg="igvc_flatland" type="diff_drive" name="diff_drive" />
+    
+  <node pkg="igvc_flatland" type="final_project" name="final_project"/>
+  
+  <node pkg="move_base" type="move_base" name="move_base">
+    <rosparam ns="global_costmap" file="$(find igvc_flatland)/yaml/global_costmap_params.yaml" />
+    <rosparam ns="global_costmap" file="$(find maze_world_navigation)/yaml/global_costmap_mapping_params.yaml" />
+    <rosparam ns="local_costmap" file="$(find igvc_flatland)/yaml/local_costmap_params.yaml" />
+    <rosparam ns="NavfnROS" file="$(find igvc_flatland)/yaml/global_planner_params.yaml" />
+    <rosparam ns="TrajectoryPlannerROS" file="$(find igvc_flatland)/yaml/local_planner_params.yaml" />
+    <rosparam file="$(find igvc_flatland)/yaml/move_base_params.yaml" />
+    <!--remap from="cmd_vel" to="/mantis/cmd_vel" /-->
+  </node>
+
+
+
+  
+  <node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 world map 30"/>
+  
+  <!-- Parse the URDF model and store the result in the 'robot_description' parameter -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find r3d3_model)/urdf/r3d3_visual.urdf.xacro'" />
+
+  <!-- This node loads the 'robot_description' parameter, subscribes to the 'joint_states' topic,
+       and publishes TF transforms for the robot's joints -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+
+  <node pkg="r3d3_model" type="r3d3_joint_pub" name="r3d3_joint_pub" />
+  
+</launch>
