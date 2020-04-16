@@ -1,27 +1,56 @@
 <?xml version="1.0"?>
-<launch>
+<launch> <!-- Compare my comments to "Step 2" of HW5 -->
+
+  <!-- Gives error without this -->
+
+  <arg name ="load_map" value = "false" />
 
   <!-- Start Gazebo and load maze world -->
+
   <param name="use_sim_time" value="true" />
   <node pkg="ugv_course_gazebo" type="robust_gazebo_launch.py" name="gazebo_launch" output="screen" >
     <param name="launch_cmd" value="$(find ugv_course_gazebo)/launch/gazebo_world.launch world_name:=$(find ugv_course_gazebo)/worlds/maze_world.world" />
   </node>
 
-<!-- Move Base Stuff -->
-  <node pkg="move_base" type="move_base" name="move_base"> 
-    <rosparam unless="$(arg load_map)" ns="global_costmap" file="$(find maze_world_navigation)/yaml/global_costmap_params.yaml" />
-    <rosparam if="$(arg load_map)" ns="global_costmap" file="$(find maze_world_navigation)/yaml/global_costmap_mapping_params.yaml" />
-    <rosparam ns="local_costmap" file="$(find maze_world_navigation)/yaml/local_costmap_params.yaml" />
-    <rosparam ns="NavfnROS" file="$(find maze_world_navigation)/yaml/global_planner_params.yaml" />
-    <rosparam ns="TrajectoryPlannerROS" file="$(find maze_world_navigation)/yaml/local_planner_params.yaml" />
-    <rosparam file="$(find maze_world_navigation)/yaml/move_base_params.yaml" />
-    <remap from="cmd_vel" to="/roundbot/cmd_vel" /> <!-- Should it be to="/mantis/command/" idk -->
-  </node> 
-<!-- Refer to hector_example ^^^ -->
+  <!-- Spawn Mantis model, run wheel controllers + lidar (reffered to mantis_gazebo.launch) -->
 
-  <node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 world map 30"/> <!-- "Solves" the localization problem -->
+  <group ns="mantis"> 
+    <rosparam file="$(find mantis_model)/yaml/roscontrol_params.yaml" />
+    <param name="robot_description" command="$(find xacro)/xacro '$(find mantis_model)/urdf/mantis.urdf.xacro'" />
+    <node pkg="gazebo_ros" type="spawn_model" name="spawn_mantis" args="-urdf -param robot_description -model mantis "/>
+    <node pkg="controller_manager" type="spawner" name="controller_spawner" args="joint_state_controller left_wheel_controller right_wheel_controller" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="tf_prefix" value="mantis" />
+    </node> <!-- run lidar? Isn't that done in move_base? -->
+  </group> 
+
+  <!-- Run move_base and load yaml config files (reffered to hector_example) -->
+
+   <node pkg="move_base" type="move_base" name="move_base"> 
+    <rosparam unless="$(arg load_map)" ns="global_costmap" file="$(find homework5)/yaml/global_costmap_params.yaml" />
+    <rosparam if="$(arg load_map)" ns="global_costmap" file="$(find homework5)/yaml/global_costmap_mapping_params.yaml" />
+    <rosparam ns="local_costmap" file="$(find homework5)/yaml/local_costmap_params.yaml" />
+    <rosparam ns="NavfnROS" file="$(find homework5)/yaml/global_planner_params.yaml" />
+    <rosparam ns="TrajectoryPlannerROS" file="$(find homework5)/yaml/local_planner_params.yaml" />
+    <rosparam file="$(find homework5)/yaml/move_base_params.yaml" />
+    <!-- remap from="cmd_vel" to="/roundbot/cmd_vel" /--> <!-- adjust this line -->
+    <remap from="cmd_vel" to="/mantis/twist_cmd" />
+   </node>
+
+  <!-- "Solve" localization problem (reffered to maze_world_navigation) -->
+
+   <node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 world map 30"/> 
+
+  <!-- Start rviz and load config file to show costmaps, plan, and mantis model (reffered to mantis_model.launch) -->
+
+
+  <param name="robot_description" command="$(find xacro)/xacro '$(find mantis_model)/urdf/mantis_visual.urdf.xacro'" />
+  <!-- node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" /-->
+  <node pkg="mantis_model" type="mantis_joint_pub" name="mantis_joint_pub" />
+
 
   <!-- Test script -->
+
   <node pkg="homework5" type="test_homework5" name="test_homework5" output="screen" />
 
 </launch>
