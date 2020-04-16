@@ -1,0 +1,114 @@
+bodies:  # List of named bodies
+- name: base
+  pose: [0, 0, 0]
+  type: dynamic
+  color: [1, 1, 1, 0.75]
+  footprints:
+    - type: polygon
+      sensor: false
+      points: [[-0.457, 0.304], [-0.457, -0.304], [0.457, -0.304], [0.457, 0.304], [-0.457, 0.304]]
+      density: 10.0
+      layers: ["robot", "objects"]
+- name: left_wheel
+  color: [1, 1, 1, 0.75]
+  footprints:
+    - type: polygon
+      sensor: false
+      points: [[-0.08, 0.025], [-0.08, -0.025], [0.08, -0.025], [0.08, 0.025], [-0.08, 0.025]]
+      density: 10.0
+      layers: ["robot"]
+- name: right_wheel
+  color: [1, 1, 1, 0.75]
+  footprints:
+    - type: polygon
+      sensor: false
+      points: [[-0.08, 0.025], [-0.08, -0.025], [0.08, -0.025], [0.08, 0.025], [-0.08, 0.025]]
+      density: 10.0
+      layers: ["robot"]
+- name: lidar
+  color: [1, 0, 0, 0.75]
+  footprints:
+    - type: circle
+      radius: 0.05
+      center: [0.0, 0.0]
+      density: 1.0
+      layers: ["robot"]
+
+joints:
+- type: weld
+  name: left_wheel_weld
+  bodies:
+  - name: left_wheel
+    anchor: [0, 0]
+  - name: base
+    anchor: [0, 0.28]
+- type: weld
+  name: right_wheel_weld
+  bodies:
+  - name: right_wheel
+    anchor: [0, 0]
+  - name: base
+    anchor: [0, -0.28]
+- type: weld
+  name: lidar_weld
+  bodies:
+  - name: lidar
+    anchor: [0, 0]
+  - name: base
+    anchor: [0.3, 0]
+
+plugins:
+- type: DiffDrive
+  name: diff_drive
+  body: base
+  enable_odom_pub: false
+  enable_twist_pub: true
+  pub_rate: 50
+  odom_twist_noise: [0.001, 0.001, 0.001]
+
+- type: AutoJudge
+  name: auto_judge
+  lines_map: maps/basic_course_lines.yaml
+  time_limit: 360.0 # 6 minutes
+  waypoints:
+  - name: south_opening
+    dist_thres: 1.5
+    world_coords: [22.05, -15.23]
+  - name: north_opening
+    dist_thres: 1.5
+    world_coords: [21.92, 15.65]
+
+- type: Gps
+  name: gps
+  body: base
+  ref_lat: 42.678942
+  ref_lon: -83.195185
+  broadcast_tf: true
+
+- type: Laser
+  name: lidar
+  topic: scan
+  body: lidar
+  broadcast_tf: false
+  origin: [0, 0, 0]
+  range: 20
+  angle: {min: -2.35, max: 2.35, increment: 0.0062831}
+  noise_std_dev: 0.01
+  update_rate: 35
+  layers: ["objects"]
+
+- type: Laser
+  name: camera
+  topic: camera_scan
+  body: base
+  broadcast_tf: true
+  origin: [0, 0, 0]
+  range: 5.0
+  angle: {min: -0.43, max: 0.43, increment: 0.0062831}
+  noise_std_dev: 0.03
+  update_rate: 35
+  layers: ["lines"]
+
+- type: ModelTfPublisher
+  name: tf_publisher
+  publish_tf_world: true
