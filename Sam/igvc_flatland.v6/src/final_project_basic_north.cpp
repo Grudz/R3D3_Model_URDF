@@ -53,10 +53,9 @@ ROS_INFO("Waiting for result");
 
 if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
     ++current_waypoint; 
-    ROS_INFO("Hooray, the base moved 1 meter forward");
 }
 else
-     ROS_INFO("The base failed to move forward 1 meter for some reason");
+     ROS_INFO("The base failed to move towards goal");
 
 ROS_INFO("current_waypoint check 2: (%d)", current_waypoint);
 
