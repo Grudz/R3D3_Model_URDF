@@ -1,0 +1,4 @@
+glob:
+
+# Map images
+*.pgm

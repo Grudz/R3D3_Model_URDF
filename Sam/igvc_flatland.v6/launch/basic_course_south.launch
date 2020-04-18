@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find igvc_flatland)/launch/basic_course_world.launch" >
+    <arg name="initial_pose_x" value="-25.0" />
+    <arg name="initial_pose_y" value="0.0" />
+    <arg name="initial_pose_a" value="-1.5707" />
+    <arg name="run_rviz" value="true" />
+  </include>
+  
+    <node pkg="move_base" type="move_base" name="move_base">
+    <rosparam ns="global_costmap" file="$(find igvc_flatland)/yaml/global_costmap_params.yaml" />
+    <rosparam ns="global_costmap" file="$(find igvc_flatland)/yaml/global_costmap_mapping_params.yaml" />
+    <rosparam ns="local_costmap" file="$(find igvc_flatland)/yaml/local_costmap_params.yaml" />
+    <rosparam ns="NavfnROS" file="$(find igvc_flatland)/yaml/global_planner_params.yaml" />
+    <rosparam ns="TrajectoryPlannerROS" file="$(find igvc_flatland)/yaml/local_planner_params.yaml" />
+    <rosparam file="$(find igvc_flatland)/yaml/move_base_params.yaml" />
+    <!--remap from="cmd_vel" to="/mantis/cmd_vel" /-->
+  </node>
+   
+  
+  <node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 world map 30"/>
+  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find igvc_flatland)/maps/basic_course_lines.yaml"/>
+  
+  <node pkg="igvc_flatland" type="final_project_basic_south" name="final_project_basic_south"/>
+
+  <node pkg="rviz" type="rviz" name="rviz_igvc_config" args="-d $(find igvc_flatland)/rviz/rviz_igvc_config.rviz" />
+
+</launch>

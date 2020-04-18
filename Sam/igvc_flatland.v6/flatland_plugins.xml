@@ -1,0 +1,8 @@
+<library path="lib/libigvc_flatland_plugins_lib">
+  <class type="flatland_plugins::AutoJudge" base_class_type="flatland_server::ModelPlugin">
+    <description>Make sure simulated robot follows IGVC rules</description>
+  </class>
+  <class type="flatland_plugins::RandomGates" base_class_type="flatland_server::WorldPlugin">
+    <description>Randomly close two of the three openings on the advanced course at startup</description>
+  </class>
+</library>
